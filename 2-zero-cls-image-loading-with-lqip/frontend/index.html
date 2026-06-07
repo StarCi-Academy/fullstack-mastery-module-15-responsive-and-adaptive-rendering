@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StarCi Academy</title>
+    <!-- Static preload of the LCP hero so the preload scanner discovers it during HTML
+         parse and assigns High priority. In a real app the hero URL is known at build
+         time; here it matches the first fallback product (seed "headphones"). -->
+    <link
+      rel="preload"
+      as="image"
+      href="https://picsum.photos/seed/headphones/800/533"
+      fetchpriority="high"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

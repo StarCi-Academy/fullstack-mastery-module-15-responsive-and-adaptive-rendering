@@ -1,0 +1,109 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+:root,
+.light,
+[data-theme="light"] {
+  --accent: oklch(62.04% 0.1950 185.90);
+  --accent-foreground: oklch(99.11% 0 0);
+  --background: oklch(97.02% 0.0033 185.90);
+  --border: oklch(90.00% 0.0033 185.90);
+  --foreground: oklch(21.03% 0.0033 185.90);
+  --radius: 0.5rem;
+  --field-radius: 0.75rem;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, sans-serif;
+}
+
+/* ─── Gallery grid: auto-fit columns, no @media ─── */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* ─── Product card ─── */
+.product-card {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.product-card-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+    /* LQIP: tiny blurred placeholder while the real image loads */
+    background: oklch(90% 0.003 185.90);
+    background-size: cover;
+}
+
+.product-card-body {
+    padding: 0.75rem;
+}
+
+.product-card-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+    color: var(--foreground);
+}
+
+.product-card-price {
+    font-size: 0.875rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ─── Hero picture element ─── */
+.hero-picture {
+    display: block;
+    width: 100%;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.hero-picture img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 3 / 1;
+}
+
+/* On narrow viewports the square crop has a 1:1 ratio */
+@media (max-width: 640px) {
+    .hero-picture img {
+        aspect-ratio: 1 / 1;
+    }
+}
+
+/* ─── Section labels ─── */
+.section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: oklch(50% 0.003 185.90);
+    margin-bottom: 0.5rem;
+}
+
+/* ─── Lazy image placeholder ─── */
+.lazy-img {
+    aspect-ratio: 4 / 3;
+    background: oklch(93% 0.003 185.90);
+    background-size: cover;
+}
