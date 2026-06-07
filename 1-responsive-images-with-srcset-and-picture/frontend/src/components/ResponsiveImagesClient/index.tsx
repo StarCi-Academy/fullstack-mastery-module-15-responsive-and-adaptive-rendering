@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { Card, Chip, Typography } from "@heroui/react"
 
 /** Shape of one product returned by GET /api/products. */
 export interface Product {
@@ -46,15 +47,20 @@ function buildFallbackProducts(): Product[] {
             "Desk Lamp",
         ][id - 1],
         price: ["$149", "$89", "$45", "$35", "$119", "$29"][id - 1],
-        img400: `${base}/images/product-${id}-400w.jpg`,
-        img800: `${base}/images/product-${id}-800w.jpg`,
-        img1200: `${base}/images/product-${id}-1200w.jpg`,
-        wideAvif: `${base}/images/product-${id}-wide.avif`,
-        wideWebp: `${base}/images/product-${id}-wide.webp`,
-        wideJpg: `${base}/images/product-${id}-wide.jpg`,
-        squareAvif: `${base}/images/product-${id}-square.avif`,
-        squareWebp: `${base}/images/product-${id}-square.webp`,
-        squareJpg: `${base}/images/product-${id}-square.jpg`,
+        // Real images via picsum (online) so the demo renders without a backend or
+        // local asset pipeline. Stable seed per product => stable image across reloads.
+        // (picsum serves JPEG only; the avif/webp <source> slots reuse the same URL so
+        // the browser always lands on a decodable image — art-direction wide/square is
+        // still demonstrated via the picture media queries.)
+        img400: `${base}https://picsum.photos/seed/p${id}/400/267`,
+        img800: `${base}https://picsum.photos/seed/p${id}/800/533`,
+        img1200: `${base}https://picsum.photos/seed/p${id}/1200/800`,
+        wideAvif: `https://picsum.photos/seed/p${id}-wide/1200/500`,
+        wideWebp: `https://picsum.photos/seed/p${id}-wide/1200/500`,
+        wideJpg: `https://picsum.photos/seed/p${id}-wide/1200/500`,
+        squareAvif: `https://picsum.photos/seed/p${id}-square/600/600`,
+        squareWebp: `https://picsum.photos/seed/p${id}-square/600/600`,
+        squareJpg: `https://picsum.photos/seed/p${id}-square/600/600`,
     }))
 }
 
@@ -150,17 +156,23 @@ function ProductCard({
     aboveFold: boolean
 }): JSX.Element {
     return (
-        <article className="product-card">
+        <Card className="product-card overflow-hidden p-0">
+            {/* The native <img>/<picture> functional core is unchanged — only the
+                surrounding chrome is now a HeroUI Card. */}
             {aboveFold ? (
                 <ProductImage product={product} />
             ) : (
                 <BelowFoldImage product={product} />
             )}
-            <div className="product-card-body">
-                <h3 className="product-card-name">{product.name}</h3>
-                <p className="product-card-price">{product.price}</p>
-            </div>
-        </article>
+            <Card.Content className="flex items-center justify-between gap-2 p-3">
+                <Typography.Paragraph size="sm" weight="semibold" className="truncate">
+                    {product.name}
+                </Typography.Paragraph>
+                <Chip variant="soft" color="accent" size="sm">
+                    {product.price}
+                </Chip>
+            </Card.Content>
+        </Card>
     )
 }
 
@@ -195,13 +207,17 @@ export function ResponsiveImagesClient(): JSX.Element {
     return (
         <div>
             {/* ── Hero: art direction + format negotiation via <picture> ── */}
-            <div className="section-label">Hero (art direction + format)</div>
+            <Typography.Paragraph size="xs" color="muted" className="section-label">
+                Hero (art direction + format)
+            </Typography.Paragraph>
             {hero && <ProductHero product={hero} />}
 
             <div className="h-6" />
 
             {/* ── Gallery: resolution switching via srcset + sizes ── */}
-            <div className="section-label">Gallery (resolution switching)</div>
+            <Typography.Paragraph size="xs" color="muted" className="section-label">
+                Gallery (resolution switching)
+            </Typography.Paragraph>
             <ul className="gallery-grid" data-testid="gallery-grid">
                 {products.map((product, index) => (
                     <li key={product.id}>

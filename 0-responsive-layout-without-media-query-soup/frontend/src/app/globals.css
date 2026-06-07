@@ -1,18 +1,8 @@
 @import "tailwindcss";
 @import "@heroui/styles";
 
-:root,
-.light,
-[data-theme="light"] {
-  --accent: oklch(62.04% 0.1950 185.90);
-  --accent-foreground: oklch(99.11% 0 0);
-  --background: oklch(97.02% 0.0033 185.90);
-  --border: oklch(90.00% 0.0033 185.90);
-  --foreground: oklch(21.03% 0.0033 185.90);
-  --radius: 0.5rem;
-  --field-radius: 0.75rem;
-}
-
+/* Canonical shell: theme tokens (--background/--foreground/--border/--accent…)
+   come from @heroui/styles, so no local :root override is needed. */
 body {
   margin: 0;
   min-height: 100vh;
@@ -20,6 +10,11 @@ body {
   color: var(--foreground);
   font-family: system-ui, sans-serif;
 }
+
+/* NOTE: this lesson intentionally does NOT add the canonical
+   `main { max-width: 48rem }` page-shell rule. The two-slot demo needs a wider
+   stage (App uses max-w-5xl) and `main` here doubles as the wide flex slot
+   (.slot-main), so a global max-width would distort the side-by-side layout. */
 
 /* ─── ProductGrid: browser-computed column count via auto-fit + minmax ─── */
 .product-grid {
@@ -157,11 +152,6 @@ body {
 }
 
 .slot-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: oklch(50% 0.0033 185.90);
     margin-bottom: 0.75rem;
 }
 

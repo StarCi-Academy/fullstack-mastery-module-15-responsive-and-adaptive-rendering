@@ -9,7 +9,7 @@ export default defineConfig({
     testDir: "./scripts",
     timeout: 60_000,
     use: {
-        baseURL: "http://localhost:3480",
+        baseURL: "http://127.0.0.1:3480",
         trace: "on-first-retry",
         screenshot: "only-on-failure",
     },

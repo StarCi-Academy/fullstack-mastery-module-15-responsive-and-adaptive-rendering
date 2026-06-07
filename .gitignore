@@ -18,3 +18,4 @@ go-err.txt
 test-results/
 playwright-report/
 .playwright/test-results/
+coverage/

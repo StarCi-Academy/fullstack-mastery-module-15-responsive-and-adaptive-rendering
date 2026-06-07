@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react"
+import { Card, Chip, Typography } from "@heroui/react"
 import { useNetworkStatus, type Capabilities } from "../../hooks/useNetworkStatus"
 
 /** Dynamic import: the chunk is fetched only when we decide to render it. */
@@ -155,7 +156,7 @@ function HeroVideo({ caps }: { caps: Capabilities }): JSX.Element {
     const shouldAutoplay = !caps.constrained
 
     return (
-        <div className="rounded-2xl overflow-hidden border border-border bg-default-100">
+        <Card className="overflow-hidden p-0">
             <video
                 data-testid="hero-video"
                 className="w-full"
@@ -164,18 +165,21 @@ function HeroVideo({ caps }: { caps: Capabilities }): JSX.Element {
                 playsInline
                 width={640}
                 height={360}
+                // Poster (real image via picsum) renders in place of a video file so the demo
+                // looks complete without bundling an .mp4; in a real app a <source> mp4 URL
+                // would be added here. autoPlay attribute still toggles on capability.
+                poster="https://picsum.photos/seed/hero-video/640/360"
                 // Conditionally spread autoPlay so the DOM attribute is absent when constrained
                 {...(shouldAutoplay ? { autoPlay: true } : {})}
-            >
-                {/* Placeholder source — in a real app this would be the actual video URL */}
-                <source src="/assets/hero-clip.mp4" type="video/mp4" />
-            </video>
-            <p className="px-3 py-2 text-xs text-muted">
-                {shouldAutoplay
-                    ? "Video autoplaying — capable connection detected."
-                    : "Video autoplay disabled to save data."}
-            </p>
-        </div>
+            />
+            <div className="px-3 py-2">
+                <Typography.Paragraph size="xs" color="muted">
+                    {shouldAutoplay
+                        ? "Video autoplaying — capable connection detected."
+                        : "Video autoplay disabled to save data."}
+                </Typography.Paragraph>
+            </div>
+        </Card>
     )
 }
 
@@ -230,16 +234,23 @@ function AdaptiveSection({ caps }: { caps: Capabilities }): JSX.Element {
     return (
         <div ref={anchorRef} data-testid="heavy-anchor">
             {shouldLoad ? (
-                <Suspense fallback={<div data-testid="heavy-fallback">Loading widget…</div>}>
+                <Suspense
+                    fallback={
+                        <Card data-testid="heavy-fallback" className="px-4 py-3">
+                            <Typography.Paragraph size="sm" color="muted">
+                                Loading widget…
+                            </Typography.Paragraph>
+                        </Card>
+                    }
+                >
                     <HeavyWidget />
                 </Suspense>
             ) : (
-                <p
-                    className="rounded-2xl border border-border bg-default-100 px-4 py-3 text-sm text-muted"
-                    data-testid="heavy-deferred"
-                >
-                    Heavy widget deferred for this connection.
-                </p>
+                <Card data-testid="heavy-deferred" className="px-4 py-3">
+                    <Typography.Paragraph size="sm" color="muted">
+                        Heavy widget deferred for this connection.
+                    </Typography.Paragraph>
+                </Card>
             )}
         </div>
     )
@@ -253,11 +264,8 @@ function AdaptiveSection({ caps }: { caps: Capabilities }): JSX.Element {
  */
 function CapabilitiesPanel({ caps }: { caps: Capabilities }): JSX.Element {
     return (
-        <div
-            className="rounded-2xl border border-border bg-content1 p-4"
-            data-testid="capabilities-panel"
-        >
-            <div className="flex items-center gap-2 mb-3">
+        <Card data-testid="capabilities-panel" className="p-4">
+            <Card.Header className="flex items-center gap-2 p-0">
                 {/* Inline SVG — signal/wifi icon */}
                 <svg
                     width="18"
@@ -276,37 +284,41 @@ function CapabilitiesPanel({ caps }: { caps: Capabilities }): JSX.Element {
                     <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
                     <line x1="12" y1="20" x2="12.01" y2="20" />
                 </svg>
-                <span className="text-sm font-semibold text-foreground">Detected capabilities</span>
-            </div>
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                <dt className="text-muted">effectiveType</dt>
-                <dd className="font-mono text-foreground">{caps.effectiveType}</dd>
+                <Typography.Heading level={6} weight="semibold">
+                    Detected capabilities
+                </Typography.Heading>
+            </Card.Header>
+            <Card.Content className="flex flex-col gap-3 p-0">
+                <div className="h-1" />
+                <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                    <dt className="text-muted">effectiveType</dt>
+                    <dd className="font-mono text-foreground">{caps.effectiveType}</dd>
 
-                <dt className="text-muted">saveData</dt>
-                <dd className="font-mono text-foreground">{String(caps.saveData)}</dd>
+                    <dt className="text-muted">saveData</dt>
+                    <dd className="font-mono text-foreground">{String(caps.saveData)}</dd>
 
-                <dt className="text-muted">reducedData</dt>
-                <dd className="font-mono text-foreground">{String(caps.reducedData)}</dd>
+                    <dt className="text-muted">reducedData</dt>
+                    <dd className="font-mono text-foreground">{String(caps.reducedData)}</dd>
 
-                <dt className="text-muted">deviceMemory</dt>
-                <dd className="font-mono text-foreground">{caps.deviceMemory} GB</dd>
+                    <dt className="text-muted">deviceMemory</dt>
+                    <dd className="font-mono text-foreground">{caps.deviceMemory} GB</dd>
 
-                <dt className="text-muted">constrained</dt>
-                <dd className="font-mono text-foreground">{String(caps.constrained)}</dd>
-            </dl>
-            <div className="h-3" />
-            <div
-                className={`rounded-xl px-3 py-1.5 text-xs font-medium ${
-                    caps.constrained
-                        ? "bg-danger/10 text-danger"
-                        : "bg-success/10 text-success"
-                }`}
-            >
-                {caps.constrained
-                    ? "Constrained — serving lightweight payload"
-                    : "Capable — serving full-quality payload"}
-            </div>
-        </div>
+                    <dt className="text-muted">constrained</dt>
+                    <dd className="font-mono text-foreground">{String(caps.constrained)}</dd>
+                </dl>
+                {/* Status chip — danger when constrained, success when capable. */}
+                <Chip
+                    variant="secondary"
+                    color={caps.constrained ? "danger" : "success"}
+                    size="sm"
+                    className="w-fit"
+                >
+                    {caps.constrained
+                        ? "Constrained — serving lightweight payload"
+                        : "Capable — serving full-quality payload"}
+                </Chip>
+            </Card.Content>
+        </Card>
     )
 }
 
@@ -323,16 +335,21 @@ function ProductCard({
     isHero?: boolean
 }): JSX.Element {
     return (
-        <article className="rounded-2xl border border-border bg-content1 overflow-hidden">
+        <Card className="overflow-hidden p-0">
+            {/* Functional core: adaptive <img> stays untouched (variant testid lives here). */}
             <AdaptiveImage image={product.image} caps={caps} priority={isHero} />
-            <div className="p-3">
-                <p className="text-sm font-semibold text-foreground">{product.name}</p>
-                <div className="h-1.5" />
-                <p className="text-xs text-muted">{product.description}</p>
-                <div className="h-2" />
-                <span className="text-xs font-medium text-accent">{product.price}</span>
-            </div>
-        </article>
+            <Card.Content className="flex flex-col gap-1.5 p-3">
+                <Typography.Paragraph size="sm" weight="semibold">
+                    {product.name}
+                </Typography.Paragraph>
+                <Typography.Paragraph size="xs" color="muted">
+                    {product.description}
+                </Typography.Paragraph>
+                <Chip variant="secondary" color="accent" size="sm" className="w-fit">
+                    {product.price}
+                </Chip>
+            </Card.Content>
+        </Card>
     )
 }
 

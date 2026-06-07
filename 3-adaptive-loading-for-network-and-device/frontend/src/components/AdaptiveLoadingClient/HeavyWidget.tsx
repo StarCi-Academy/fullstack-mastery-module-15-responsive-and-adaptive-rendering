@@ -1,3 +1,5 @@
+import { Card, Typography } from "@heroui/react"
+
 /**
  * HeavyWidget — simulates an expensive UI chunk (charts, rich editor, etc.).
  * This module is dynamically imported via lazy(); the JS chunk is only fetched
@@ -5,12 +7,9 @@
  */
 export default function HeavyWidget(): JSX.Element {
     return (
-        <div
-            className="rounded-2xl border border-border bg-content1 p-4"
-            data-testid="heavy-widget"
-        >
-            {/* Inline SVG icon — no icon package dependency */}
-            <div className="flex items-center gap-2 mb-3">
+        <Card data-testid="heavy-widget" className="p-4">
+            <Card.Header className="flex items-center gap-2 p-0">
+                {/* Inline SVG icon — no icon package dependency */}
                 <svg
                     width="20"
                     height="20"
@@ -25,21 +24,26 @@ export default function HeavyWidget(): JSX.Element {
                 >
                     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
                 </svg>
-                <span className="text-sm font-semibold text-foreground">Analytics Widget</span>
-            </div>
-            {/* Simulated chart bars */}
-            <div className="flex items-end gap-1 h-16">
-                {[40, 65, 55, 80, 70, 90, 60].map((h, i) => (
-                    <div
-                        key={i}
-                        className="flex-1 rounded-sm bg-accent opacity-70"
-                        style={{ height: `${h}%` }}
-                    />
-                ))}
-            </div>
-            <p className="mt-2 text-xs text-muted">
-                Heavy analytics widget — loaded because your connection is capable.
-            </p>
-        </div>
+                <Typography.Heading level={6} weight="semibold">
+                    Analytics Widget
+                </Typography.Heading>
+            </Card.Header>
+            <Card.Content className="flex flex-col gap-2 p-0">
+                <div className="h-1" />
+                {/* Simulated chart bars */}
+                <div className="flex items-end gap-1 h-16">
+                    {[40, 65, 55, 80, 70, 90, 60].map((h, i) => (
+                        <div
+                            key={i}
+                            className="flex-1 rounded-sm bg-accent opacity-70"
+                            style={{ height: `${h}%` }}
+                        />
+                    ))}
+                </div>
+                <Typography.Paragraph size="xs" color="muted">
+                    Heavy analytics widget — loaded because your connection is capable.
+                </Typography.Paragraph>
+            </Card.Content>
+        </Card>
     )
 }

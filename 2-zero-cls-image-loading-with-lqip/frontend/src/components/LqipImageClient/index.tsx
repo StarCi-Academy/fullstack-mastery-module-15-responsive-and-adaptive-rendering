@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { Button, Card, Chip, Typography } from "@heroui/react"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -202,23 +203,29 @@ function ProductCard({ product, index }: { product: Product; index: number }): J
     const { ref, visible } = useLazyImage("200px")
 
     return (
-        // The ref wrapper lets IntersectionObserver track when this card enters rootMargin
+        // The ref wrapper lets IntersectionObserver track when this card enters rootMargin.
+        // The testid + ref stay on this element so the observer + Playwright selectors are unchanged.
         <div ref={ref} data-testid={`product-${index}`}>
-            <ReservedImage
-                // Only assign the real src once the card is near the viewport.
-                // Use undefined (not the lqip) so the sharp <img> does not fire onLoad
-                // for the placeholder — the crossfade must wait for the REAL image.
-                src={visible ? product.src : undefined}
-                width={product.width}
-                height={product.height}
-                lqip={product.lqip}
-                alt={product.name}
-                fetchPriority="auto"
-                // data-fullsrc stores the real URL so Playwright can detect it before the fetch
-                data-fullsrc={product.src}
-            />
-            <div className="h-2" />
-            <div className="text-sm font-medium text-foreground">{product.name}</div>
+            <Card className="overflow-hidden">
+                <ReservedImage
+                    // Only assign the real src once the card is near the viewport.
+                    // Use undefined (not the lqip) so the sharp <img> does not fire onLoad
+                    // for the placeholder — the crossfade must wait for the REAL image.
+                    src={visible ? product.src : undefined}
+                    width={product.width}
+                    height={product.height}
+                    lqip={product.lqip}
+                    alt={product.name}
+                    fetchPriority="auto"
+                    // data-fullsrc stores the real URL so Playwright can detect it before the fetch
+                    data-fullsrc={product.src}
+                />
+                <Card.Content className="p-3">
+                    <Typography.Paragraph size="sm" weight="medium">
+                        {product.name}
+                    </Typography.Paragraph>
+                </Card.Content>
+            </Card>
         </div>
     )
 }
@@ -256,40 +263,49 @@ export function LqipImageClient(): JSX.Element {
     const gridProducts = products.slice(1)
 
     return (
-        <div>
-            {/* Hero — LCP element, high fetchpriority + preload */}
-            <div data-testid="hero" className="rounded-2xl overflow-hidden">
-                <Hero
-                    src={heroProduct.src}
-                    width={heroProduct.width}
-                    height={heroProduct.height}
-                    lqip={heroProduct.lqip}
-                />
+        <div className="flex flex-col gap-6">
+            {/* Hero — LCP element, high fetchpriority + preload. testid stays on the
+                outer div so flow-4 can read .sharp inside it unchanged. */}
+            <div className="flex flex-col gap-3">
+                <div data-testid="hero" className="overflow-hidden rounded-2xl">
+                    <Hero
+                        src={heroProduct.src}
+                        width={heroProduct.width}
+                        height={heroProduct.height}
+                        lqip={heroProduct.lqip}
+                    />
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                    <Chip color="success" variant="soft" size="sm">
+                        fetchpriority=&quot;high&quot;
+                    </Chip>
+                    <Chip variant="soft" size="sm">
+                        &lt;link rel=&quot;preload&quot;&gt;
+                    </Chip>
+                    <Typography.Paragraph size="xs" color="muted">
+                        Hero is prioritised so it lands first → smaller LCP.
+                    </Typography.Paragraph>
+                </div>
             </div>
-            <div className="h-3" />
-            <div className="text-xs text-muted">
-                Hero image: <code className="text-foreground">fetchpriority=&quot;high&quot;</code> + preload hint in &lt;head&gt;
-            </div>
 
-            <div className="h-6" />
-
-            {/* Reload button — lets the user clear the cache and watch the blur-up again */}
-            <button
-                type="button"
-                className="text-xs text-muted underline"
-                onClick={() => {
-                    setShowReloadHint(true)
-                    // Force reload bypassing cache so LQIP phase is visible again
-                    window.location.reload()
-                }}
-            >
-                Reload to observe LQIP blur-up again
-            </button>
-            {showReloadHint && (
-                <span className="ml-2 text-xs text-muted">Reloading…</span>
-            )}
-
-            <div className="h-6" />
+            {/* Reload control — clears the cache so the LQIP blur-up is visible again */}
+            <Card className="flex flex-row items-center justify-between gap-3 p-3">
+                <Typography.Paragraph size="sm" color="muted">
+                    Reload bypassing cache to watch the LQIP blur-up replay.
+                </Typography.Paragraph>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    isPending={showReloadHint}
+                    onPress={() => {
+                        setShowReloadHint(true)
+                        // Force reload bypassing cache so LQIP phase is visible again
+                        window.location.reload()
+                    }}
+                >
+                    Reload
+                </Button>
+            </Card>
 
             {/* Product grid — below-fold images lazy-loaded via IntersectionObserver */}
             <section data-testid="product-grid" className="product-grid">

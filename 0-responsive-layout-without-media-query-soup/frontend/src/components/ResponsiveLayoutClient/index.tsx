@@ -1,3 +1,4 @@
+import { Chip } from "@heroui/react"
 import { useEffect, useState } from "react"
 
 /** Shape of a product returned by GET /api/products */
@@ -129,13 +130,21 @@ export function ResponsiveLayoutClient(): JSX.Element {
         <div className="page-layout">
             {/* Sidebar slot: narrow (~260px) — cards use compact layout via @container */}
             <aside className="slot-sidebar" data-testid="slot-sidebar">
-                <div className="slot-label">Sidebar</div>
+                <div className="slot-label">
+                    <Chip variant="soft" color="default" size="sm">
+                        Sidebar
+                    </Chip>
+                </div>
                 <ProductGrid products={sidebarProducts} />
             </aside>
 
             {/* Main slot: wide (flex-1) — same cards switch to rich layout via @container */}
             <main className="slot-main" data-testid="slot-main">
-                <div className="slot-label">Main column</div>
+                <div className="slot-label">
+                    <Chip variant="soft" color="accent" size="sm">
+                        Main column
+                    </Chip>
+                </div>
                 <ProductGrid products={products} />
             </main>
         </div>
