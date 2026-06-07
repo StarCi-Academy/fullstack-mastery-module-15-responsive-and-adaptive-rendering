@@ -1,4 +1,3 @@
-import { Chip } from "@heroui/react"
 import { useEffect, useState } from "react"
 
 /** Shape of a product returned by GET /api/products */
@@ -61,20 +60,20 @@ function ProductCard({ product }: { product: Product }): JSX.Element {
     return (
         // The wrapper is the query container; the card reads ITS width, not the viewport
         <div className="card-container">
-            <article className="card" data-testid={`card-${product.id}`}>
+            <article className="card gap-0 rounded-3xl p-0" data-testid={`card-${product.id}`}>
                 <img
                     className="card-thumb"
                     src={product.image}
                     alt={product.name}
                     loading="lazy"
                 />
-                <div className="card-body">
+                <div className="card-body p-3">
                     <h3 className="card-title">{product.name}</h3>
                     {/* Description and buy button only appear in the rich (wide-container) layout */}
                     <p className="card-desc" data-testid={`desc-${product.id}`}>
                         {product.description}
                     </p>
-                    <button className="card-buy" type="button">
+                    <button className="card-buy rounded-3xl" type="button">
                         Buy {product.price}
                     </button>
                 </div>
@@ -130,21 +129,13 @@ export function ResponsiveLayoutClient(): JSX.Element {
         <div className="page-layout">
             {/* Sidebar slot: narrow (~260px) — cards use compact layout via @container */}
             <aside className="slot-sidebar" data-testid="slot-sidebar">
-                <div className="slot-label">
-                    <Chip variant="soft" color="default" size="sm">
-                        Sidebar
-                    </Chip>
-                </div>
+                <p className="slot-label text-sm font-semibold">Sidebar</p>
                 <ProductGrid products={sidebarProducts} />
             </aside>
 
             {/* Main slot: wide (flex-1) — same cards switch to rich layout via @container */}
             <main className="slot-main" data-testid="slot-main">
-                <div className="slot-label">
-                    <Chip variant="soft" color="accent" size="sm">
-                        Main column
-                    </Chip>
-                </div>
+                <p className="slot-label text-sm font-semibold">Main column</p>
                 <ProductGrid products={products} />
             </main>
         </div>

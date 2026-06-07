@@ -7,26 +7,9 @@ import { Card, Typography } from "@heroui/react"
  */
 export default function HeavyWidget(): JSX.Element {
     return (
-        <Card data-testid="heavy-widget" className="p-4">
-            <Card.Header className="flex items-center gap-2 p-0">
-                {/* Inline SVG icon — no icon package dependency */}
-                <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                    className="text-accent"
-                >
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                </svg>
-                <Typography.Heading level={6} weight="semibold">
-                    Analytics Widget
-                </Typography.Heading>
+        <Card data-testid="heavy-widget" className="rounded-3xl border border-border p-3 shadow-none">
+            <Card.Header className="p-0">
+                <p className="text-sm font-semibold">Analytics Widget</p>
             </Card.Header>
             <Card.Content className="flex flex-col gap-2 p-0">
                 <div className="h-1" />

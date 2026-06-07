@@ -20,7 +20,6 @@ main {
     position: relative;
     width: 100%;
     overflow: hidden;
-    border-radius: 0.5rem;
 }
 
 /* Both LQIP and sharp layers fill the reserved frame exactly */

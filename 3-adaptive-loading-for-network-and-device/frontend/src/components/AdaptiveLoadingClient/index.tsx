@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react"
-import { Card, Chip, Typography } from "@heroui/react"
+import { Card, Typography } from "@heroui/react"
 import { useNetworkStatus, type Capabilities } from "../../hooks/useNetworkStatus"
 
 /** Dynamic import: the chunk is fetched only when we decide to render it. */
@@ -30,12 +30,7 @@ export interface Product {
 
 // ─── Product data ──────────────────────────────────────────────────────────────
 
-/**
- * Self-contained product catalog with multi-resolution image URLs.
- * The lesson is a pure Vite frontend: the data ships with the app, so the
- * adaptive-loading mechanism (a frontend concern) can be observed without any
- * backend to start. Each product carries low/medium/high image candidates.
- */
+/** Static catalog — multi-resolution image URLs per product, no backend required. */
 const PRODUCTS: Product[] = [
     {
         id: 1,
@@ -91,6 +86,12 @@ const PRODUCTS: Product[] = [
     },
 ]
 
+/** CC0 hero clip (MDN interactive examples) — free to hotlink, no API key. */
+const HERO_VIDEO_SRC =
+    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+/** Poster while the clip buffers or when autoplay is disabled. */
+const HERO_VIDEO_POSTER = "https://picsum.photos/seed/hero-video/640/360"
+
 // ─── AdaptiveImage ────────────────────────────────────────────────────────────
 
 /**
@@ -117,7 +118,7 @@ function AdaptiveImage({
                 decoding="async"
                 width={480}
                 height={320}
-                className="w-full rounded-xl object-cover"
+                className="w-full object-cover"
                 data-testid="adaptive-image"
                 data-variant="low"
             />
@@ -136,7 +137,7 @@ function AdaptiveImage({
             decoding="async"
             width={960}
             height={640}
-            className="w-full rounded-xl object-cover"
+            className="w-full object-cover"
             data-testid="adaptive-image"
             data-variant="srcset"
         />
@@ -156,23 +157,21 @@ function HeroVideo({ caps }: { caps: Capabilities }): JSX.Element {
     const shouldAutoplay = !caps.constrained
 
     return (
-        <Card className="overflow-hidden p-0">
+        <Card className="gap-0 overflow-hidden rounded-3xl border border-border p-0 shadow-none">
             <video
                 data-testid="hero-video"
-                className="w-full"
+                className="aspect-video w-full object-cover"
                 loop
                 muted
                 playsInline
                 width={640}
                 height={360}
-                // Poster (real image via picsum) renders in place of a video file so the demo
-                // looks complete without bundling an .mp4; in a real app a <source> mp4 URL
-                // would be added here. autoPlay attribute still toggles on capability.
-                poster="https://picsum.photos/seed/hero-video/640/360"
-                // Conditionally spread autoPlay so the DOM attribute is absent when constrained
+                poster={HERO_VIDEO_POSTER}
                 {...(shouldAutoplay ? { autoPlay: true } : {})}
-            />
-            <div className="px-3 py-2">
+            >
+                <source src={HERO_VIDEO_SRC} type="video/mp4" />
+            </video>
+            <div className="p-3">
                 <Typography.Paragraph size="xs" color="muted">
                     {shouldAutoplay
                         ? "Video autoplaying — capable connection detected."
@@ -236,7 +235,7 @@ function AdaptiveSection({ caps }: { caps: Capabilities }): JSX.Element {
             {shouldLoad ? (
                 <Suspense
                     fallback={
-                        <Card data-testid="heavy-fallback" className="px-4 py-3">
+                        <Card data-testid="heavy-fallback" className="rounded-3xl border border-border p-3 shadow-none">
                             <Typography.Paragraph size="sm" color="muted">
                                 Loading widget…
                             </Typography.Paragraph>
@@ -246,7 +245,7 @@ function AdaptiveSection({ caps }: { caps: Capabilities }): JSX.Element {
                     <HeavyWidget />
                 </Suspense>
             ) : (
-                <Card data-testid="heavy-deferred" className="px-4 py-3">
+                <Card data-testid="heavy-deferred" className="rounded-3xl border border-border p-3 shadow-none">
                     <Typography.Paragraph size="sm" color="muted">
                         Heavy widget deferred for this connection.
                     </Typography.Paragraph>
@@ -264,61 +263,32 @@ function AdaptiveSection({ caps }: { caps: Capabilities }): JSX.Element {
  */
 function CapabilitiesPanel({ caps }: { caps: Capabilities }): JSX.Element {
     return (
-        <Card data-testid="capabilities-panel" className="p-4">
-            <Card.Header className="flex items-center gap-2 p-0">
-                {/* Inline SVG — signal/wifi icon */}
-                <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                    className="text-accent"
-                >
-                    <path d="M5 12.55a11 11 0 0 1 14.08 0" />
-                    <path d="M1.42 9a16 16 0 0 1 21.16 0" />
-                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
-                    <line x1="12" y1="20" x2="12.01" y2="20" />
-                </svg>
-                <Typography.Heading level={6} weight="semibold">
-                    Detected capabilities
-                </Typography.Heading>
-            </Card.Header>
-            <Card.Content className="flex flex-col gap-3 p-0">
-                <div className="h-1" />
-                <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                    <dt className="text-muted">effectiveType</dt>
-                    <dd className="font-mono text-foreground">{caps.effectiveType}</dd>
+        <div data-testid="capabilities-panel" className="flex flex-col gap-3">
+            <p className="text-sm font-semibold">Detected capabilities</p>
+            <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                <dt className="text-muted">effectiveType</dt>
+                <dd className="font-mono text-foreground">{caps.effectiveType}</dd>
 
-                    <dt className="text-muted">saveData</dt>
-                    <dd className="font-mono text-foreground">{String(caps.saveData)}</dd>
+                <dt className="text-muted">saveData</dt>
+                <dd className="font-mono text-foreground">{String(caps.saveData)}</dd>
 
-                    <dt className="text-muted">reducedData</dt>
-                    <dd className="font-mono text-foreground">{String(caps.reducedData)}</dd>
+                <dt className="text-muted">reducedData</dt>
+                <dd className="font-mono text-foreground">{String(caps.reducedData)}</dd>
 
-                    <dt className="text-muted">deviceMemory</dt>
-                    <dd className="font-mono text-foreground">{caps.deviceMemory} GB</dd>
+                <dt className="text-muted">deviceMemory</dt>
+                <dd className="font-mono text-foreground">{caps.deviceMemory} GB</dd>
 
-                    <dt className="text-muted">constrained</dt>
-                    <dd className="font-mono text-foreground">{String(caps.constrained)}</dd>
-                </dl>
-                {/* Status chip — danger when constrained, success when capable. */}
-                <Chip
-                    variant="secondary"
-                    color={caps.constrained ? "danger" : "success"}
-                    size="sm"
-                    className="w-fit"
-                >
-                    {caps.constrained
-                        ? "Constrained — serving lightweight payload"
-                        : "Capable — serving full-quality payload"}
-                </Chip>
-            </Card.Content>
-        </Card>
+                <dt className="text-muted">constrained</dt>
+                <dd className="font-mono text-foreground">{String(caps.constrained)}</dd>
+            </dl>
+            <span
+                className={`w-fit text-sm font-semibold ${caps.constrained ? "text-danger" : "text-success"}`}
+            >
+                {caps.constrained
+                    ? "Constrained — serving lightweight payload"
+                    : "Capable — serving full-quality payload"}
+            </span>
+        </div>
     )
 }
 
@@ -335,19 +305,19 @@ function ProductCard({
     isHero?: boolean
 }): JSX.Element {
     return (
-        <Card className="overflow-hidden p-0">
+        <Card className="flex h-full flex-col gap-0 overflow-hidden rounded-3xl border border-border p-0 shadow-none">
             {/* Functional core: adaptive <img> stays untouched (variant testid lives here). */}
             <AdaptiveImage image={product.image} caps={caps} priority={isHero} />
-            <Card.Content className="flex flex-col gap-1.5 p-3">
-                <Typography.Paragraph size="sm" weight="semibold">
-                    {product.name}
-                </Typography.Paragraph>
-                <Typography.Paragraph size="xs" color="muted">
+            <Card.Content className="flex flex-1 flex-col p-3">
+                <Typography.Paragraph size="xs" color="muted" className="line-clamp-2 flex-1">
                     {product.description}
                 </Typography.Paragraph>
-                <Chip variant="secondary" color="accent" size="sm" className="w-fit">
-                    {product.price}
-                </Chip>
+                <div className="mt-auto flex items-center justify-between gap-2 pt-1.5">
+                    <Typography.Paragraph size="sm" weight="semibold" className="truncate">
+                        {product.name}
+                    </Typography.Paragraph>
+                    <span className="shrink-0 text-sm font-semibold text-accent">{product.price}</span>
+                </div>
             </Card.Content>
         </Card>
     )
@@ -380,9 +350,11 @@ export function AdaptiveLoadingClient(): JSX.Element {
             <div className="h-6" />
 
             {/* Product grid — same AdaptiveImage component, variant driven by caps */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 items-stretch gap-3">
                 {PRODUCTS.map((p, i) => (
-                    <ProductCard key={p.id} product={p} caps={caps} isHero={i === 0} />
+                    <div key={p.id} className="h-full">
+                        <ProductCard product={p} caps={caps} isHero={i === 0} />
+                    </div>
                 ))}
             </div>
             <div className="h-6" />

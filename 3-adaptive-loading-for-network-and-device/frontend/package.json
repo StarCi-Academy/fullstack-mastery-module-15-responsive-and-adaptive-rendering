@@ -6,7 +6,7 @@
         "dev": "vite",
         "build": "tsc -b && vite build",
         "preview": "vite preview",
-        "test:e2e": "npm --prefix ../.playwright test",
+        "test:e2e": "npm --prefix ../.playwright test -- --project=chromium",
         "test:e2e:headed": "npm --prefix ../.playwright run test:headed",
         "test:e2e:ui": "npm --prefix ../.playwright run test:ui"
     },

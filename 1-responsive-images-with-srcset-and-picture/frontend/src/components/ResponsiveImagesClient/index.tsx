@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Card, Chip, Typography } from "@heroui/react"
+import { Card, Typography } from "@heroui/react"
 
 /** Shape of one product returned by GET /api/products. */
 export interface Product {
@@ -35,7 +35,6 @@ const GALLERY_SIZES = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px
  * `currentSrc` ("800", "wide", "square", ".avif") resolve correctly.
  */
 function buildFallbackProducts(): Product[] {
-    const base = ""
     return [1, 2, 3, 4, 5, 6].map((id) => ({
         id,
         name: [
@@ -47,20 +46,15 @@ function buildFallbackProducts(): Product[] {
             "Desk Lamp",
         ][id - 1],
         price: ["$149", "$89", "$45", "$35", "$119", "$29"][id - 1],
-        // Real images via picsum (online) so the demo renders without a backend or
-        // local asset pipeline. Stable seed per product => stable image across reloads.
-        // (picsum serves JPEG only; the avif/webp <source> slots reuse the same URL so
-        // the browser always lands on a decodable image — art-direction wide/square is
-        // still demonstrated via the picture media queries.)
-        img400: `${base}https://picsum.photos/seed/p${id}/400/267`,
-        img800: `${base}https://picsum.photos/seed/p${id}/800/533`,
-        img1200: `${base}https://picsum.photos/seed/p${id}/1200/800`,
-        wideAvif: `https://picsum.photos/seed/p${id}-wide/1200/500`,
-        wideWebp: `https://picsum.photos/seed/p${id}-wide/1200/500`,
-        wideJpg: `https://picsum.photos/seed/p${id}-wide/1200/500`,
-        squareAvif: `https://picsum.photos/seed/p${id}-square/600/600`,
-        squareWebp: `https://picsum.photos/seed/p${id}-square/600/600`,
-        squareJpg: `https://picsum.photos/seed/p${id}-square/600/600`,
+        img400: `/images/product-${id}-400w.jpg`,
+        img800: `/images/product-${id}-800w.jpg`,
+        img1200: `/images/product-${id}-1200w.jpg`,
+        wideAvif: `/images/product-${id}-wide.avif`,
+        wideWebp: `/images/product-${id}-wide.webp`,
+        wideJpg: `/images/product-${id}-wide.jpg`,
+        squareAvif: `/images/product-${id}-square.avif`,
+        squareWebp: `/images/product-${id}-square.webp`,
+        squareJpg: `/images/product-${id}-square.jpg`,
     }))
 }
 
@@ -100,7 +94,7 @@ function ProductImage({ product }: { product: Product }): JSX.Element {
  */
 function ProductHero({ product }: { product: Product }): JSX.Element {
     return (
-        <picture className="hero-picture">
+        <picture className="hero-picture overflow-hidden rounded-3xl border border-border">
             {/* Art direction: below 640px switch to the SQUARE crop (different framing). */}
             <source media="(max-width: 640px)" srcSet={product.squareAvif} type="image/avif" />
             <source media="(max-width: 640px)" srcSet={product.squareWebp} type="image/webp" />
@@ -156,7 +150,7 @@ function ProductCard({
     aboveFold: boolean
 }): JSX.Element {
     return (
-        <Card className="product-card overflow-hidden p-0">
+        <Card className="product-card gap-0 overflow-hidden rounded-3xl border border-border p-0 shadow-none">
             {/* The native <img>/<picture> functional core is unchanged — only the
                 surrounding chrome is now a HeroUI Card. */}
             {aboveFold ? (
@@ -168,9 +162,7 @@ function ProductCard({
                 <Typography.Paragraph size="sm" weight="semibold" className="truncate">
                     {product.name}
                 </Typography.Paragraph>
-                <Chip variant="soft" color="accent" size="sm">
-                    {product.price}
-                </Chip>
+                <span className="shrink-0 text-sm font-semibold text-accent">{product.price}</span>
             </Card.Content>
         </Card>
     )
@@ -207,17 +199,13 @@ export function ResponsiveImagesClient(): JSX.Element {
     return (
         <div>
             {/* ── Hero: art direction + format negotiation via <picture> ── */}
-            <Typography.Paragraph size="xs" color="muted" className="section-label">
-                Hero (art direction + format)
-            </Typography.Paragraph>
+            <p className="section-label text-sm font-semibold">Hero (art direction + format)</p>
             {hero && <ProductHero product={hero} />}
 
             <div className="h-6" />
 
             {/* ── Gallery: resolution switching via srcset + sizes ── */}
-            <Typography.Paragraph size="xs" color="muted" className="section-label">
-                Gallery (resolution switching)
-            </Typography.Paragraph>
+            <p className="section-label text-sm font-semibold">Gallery (resolution switching)</p>
             <ul className="gallery-grid" data-testid="gallery-grid">
                 {products.map((product, index) => (
                     <li key={product.id}>
