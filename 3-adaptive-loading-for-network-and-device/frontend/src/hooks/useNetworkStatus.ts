@@ -15,7 +15,7 @@ export type Capabilities = {
 }
 
 /** Read every signal behind feature-detection so absent APIs never throw. */
-function readCapabilities(): Capabilities {
+const readCapabilities = (): Capabilities => {
     const nav = navigator as Navigator & {
         connection?: { effectiveType?: string; saveData?: boolean }
         deviceMemory?: number
@@ -34,7 +34,7 @@ function readCapabilities(): Capabilities {
 }
 
 /** Returns a live snapshot of detected network and device capabilities. */
-export function useNetworkStatus(): Capabilities {
+export const useNetworkStatus = (): Capabilities => {
     const [caps, setCaps] = useState<Capabilities>(() => readCapabilities())
 
     useEffect(() => {

@@ -94,21 +94,17 @@ const HERO_VIDEO_POSTER = "https://picsum.photos/seed/hero-video/640/360"
 
 // ─── AdaptiveImage ────────────────────────────────────────────────────────────
 
-/**
- * AdaptiveImage — picks an image variant based on network capabilities.
- *
- * Constrained (slow/saveData/reducedData): forces `low` variant with no srcset.
- * Capable: returns a full `srcset` + `sizes`; browser picks by DPR and layout width.
- */
-function AdaptiveImage({
-    image,
-    caps,
-    priority = false,
-}: {
+interface AdaptiveImageProps {
     image: ProductImage
     caps: Capabilities
     priority?: boolean
-}): JSX.Element {
+}
+
+const AdaptiveImage = ({
+    image,
+    caps,
+    priority = false,
+}: AdaptiveImageProps): JSX.Element => {
     if (caps.constrained) {
         return (
             <img
@@ -146,18 +142,14 @@ function AdaptiveImage({
 
 // ─── HeroVideo ────────────────────────────────────────────────────────────────
 
-/**
- * HeroVideo — plays or pauses the hero video clip based on saveData/reducedData.
- *
- * When constrained, the video element is rendered without the `autoplay` attribute
- * so no data is consumed automatically.
- */
-function HeroVideo({ caps }: { caps: Capabilities }): JSX.Element {
+interface HeroVideoProps { caps: Capabilities }
+
+const HeroVideo = ({ caps }: HeroVideoProps): JSX.Element => {
     // autoplay only when the user has not opted into data saving
     const shouldAutoplay = !caps.constrained
 
     return (
-        <Card className="gap-0 overflow-hidden rounded-3xl border border-border p-0 shadow-none">
+        <Card className="gap-0 overflow-hidden rounded-3xl border border-default-200 p-0 shadow-none">
             <video
                 data-testid="hero-video"
                 className="aspect-video w-full object-cover"
@@ -184,15 +176,9 @@ function HeroVideo({ caps }: { caps: Capabilities }): JSX.Element {
 
 // ─── AdaptiveSection (HeavyWidget + prefetch) ─────────────────────────────────
 
-/**
- * AdaptiveSection — conditionally loads the HeavyWidget and prefetches the
- * next route based on network and device capability.
- *
- * - constrained: renders a "deferred" placeholder; no JS chunk is fetched.
- * - capable + in-viewport: loads the HeavyWidget via lazy import.
- * - fast 4g + high deviceMemory: injects a <link rel="prefetch"> for the next route.
- */
-function AdaptiveSection({ caps }: { caps: Capabilities }): JSX.Element {
+interface AdaptiveSectionProps { caps: Capabilities }
+
+const AdaptiveSection = ({ caps }: AdaptiveSectionProps): JSX.Element => {
     const [shouldLoad, setShouldLoad] = useState<boolean>(false)
     const anchorRef = useRef<HTMLDivElement>(null)
 
@@ -235,7 +221,7 @@ function AdaptiveSection({ caps }: { caps: Capabilities }): JSX.Element {
             {shouldLoad ? (
                 <Suspense
                     fallback={
-                        <Card data-testid="heavy-fallback" className="rounded-3xl border border-border p-3 shadow-none">
+                        <Card data-testid="heavy-fallback" className="rounded-3xl border border-default-200 p-3 shadow-none">
                             <Typography.Paragraph size="sm" color="muted">
                                 Loading widget…
                             </Typography.Paragraph>
@@ -245,7 +231,7 @@ function AdaptiveSection({ caps }: { caps: Capabilities }): JSX.Element {
                     <HeavyWidget />
                 </Suspense>
             ) : (
-                <Card data-testid="heavy-deferred" className="rounded-3xl border border-border p-3 shadow-none">
+                <Card data-testid="heavy-deferred" className="rounded-3xl border border-default-200 p-3 shadow-none">
                     <Typography.Paragraph size="sm" color="muted">
                         Heavy widget deferred for this connection.
                     </Typography.Paragraph>
@@ -257,14 +243,14 @@ function AdaptiveSection({ caps }: { caps: Capabilities }): JSX.Element {
 
 // ─── CapabilitiesPanel ────────────────────────────────────────────────────────
 
-/**
- * CapabilitiesPanel — shows the live detected capabilities so learners can
- * observe the adaptive decisions without opening DevTools.
- */
-function CapabilitiesPanel({ caps }: { caps: Capabilities }): JSX.Element {
+interface CapabilitiesPanelProps { caps: Capabilities }
+
+const CapabilitiesPanel = ({ caps }: CapabilitiesPanelProps): JSX.Element => {
     return (
         <div data-testid="capabilities-panel" className="flex flex-col gap-3">
-            <p className="text-sm font-semibold">Detected capabilities</p>
+            <Typography.Paragraph size="sm" color="muted" className="font-semibold">
+                Detected capabilities
+            </Typography.Paragraph>
             <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
                 <dt className="text-muted">effectiveType</dt>
                 <dd className="font-mono text-foreground">{caps.effectiveType}</dd>
@@ -294,18 +280,19 @@ function CapabilitiesPanel({ caps }: { caps: Capabilities }): JSX.Element {
 
 // ─── ProductCard ──────────────────────────────────────────────────────────────
 
-/** Single product card with adaptive image and optional hero video. */
-function ProductCard({
-    product,
-    caps,
-    isHero = false,
-}: {
+interface ProductCardProps {
     product: Product
     caps: Capabilities
     isHero?: boolean
-}): JSX.Element {
+}
+
+const ProductCard = ({
+    product,
+    caps,
+    isHero = false,
+}: ProductCardProps): JSX.Element => {
     return (
-        <Card className="flex h-full flex-col gap-0 overflow-hidden rounded-3xl border border-border p-0 shadow-none">
+        <Card className="flex h-full flex-col gap-0 overflow-hidden rounded-3xl border border-default-200 p-0 shadow-none">
             {/* Functional core: adaptive <img> stays untouched (variant testid lives here). */}
             <AdaptiveImage image={product.image} caps={caps} priority={isHero} />
             <Card.Content className="flex flex-1 flex-col p-3">
@@ -336,18 +323,16 @@ function ProductCard({
  * The single scoping anchor `adaptive-loading-root` lets tests query
  * `adaptive-image` only inside this client, never any other region.
  */
-export function AdaptiveLoadingClient(): JSX.Element {
+export const AdaptiveLoadingClient = (): JSX.Element => {
     const caps = useNetworkStatus()
 
     return (
-        <div data-testid="adaptive-loading-root">
+        <div data-testid="adaptive-loading-root" className="flex flex-col gap-6">
             {/* Capabilities readout — main demo anchor */}
             <CapabilitiesPanel caps={caps} />
-            <div className="h-6" />
 
             {/* Hero video — autoplay gated on caps.constrained */}
             <HeroVideo caps={caps} />
-            <div className="h-6" />
 
             {/* Product grid — same AdaptiveImage component, variant driven by caps */}
             <div className="grid grid-cols-2 items-stretch gap-3">
@@ -357,7 +342,6 @@ export function AdaptiveLoadingClient(): JSX.Element {
                     </div>
                 ))}
             </div>
-            <div className="h-6" />
 
             {/* Heavy widget + prefetch — conditional on capability */}
             <AdaptiveSection caps={caps} />

@@ -1,3 +1,4 @@
+import { Typography } from "@heroui/react"
 import { useEffect, useState } from "react"
 
 /** Shape of a product returned by GET /api/products */
@@ -55,8 +56,9 @@ const FALLBACK_PRODUCTS: Product[] = [
     },
 ]
 
-/** Single product card — no variant prop; layout adapts via container query in CSS. */
-function ProductCard({ product }: { product: Product }): JSX.Element {
+interface ProductCardProps { product: Product }
+
+const ProductCard = ({ product }: ProductCardProps): JSX.Element => {
     return (
         // The wrapper is the query container; the card reads ITS width, not the viewport
         <div className="card-container">
@@ -82,8 +84,9 @@ function ProductCard({ product }: { product: Product }): JSX.Element {
     )
 }
 
-/** Grid — browser computes column count via auto-fit + minmax; no @media written. */
-function ProductGrid({ products }: { products: Product[] }): JSX.Element {
+interface ProductGridProps { products: Product[] }
+
+const ProductGrid = ({ products }: ProductGridProps): JSX.Element => {
     return (
         <ul className="product-grid" data-testid="product-grid">
             {products.map((p) => (
@@ -103,7 +106,7 @@ function ProductGrid({ products }: { products: Product[] }): JSX.Element {
  *   - Container query in CSS handles compact vs rich layout per slot.
  *   - Products fetched from GET /api/products; falls back to static data on error.
  */
-export function ResponsiveLayoutClient(): JSX.Element {
+export const ResponsiveLayoutClient = (): JSX.Element => {
     const [products, setProducts] = useState<Product[]>(FALLBACK_PRODUCTS)
 
     useEffect(() => {
@@ -129,13 +132,17 @@ export function ResponsiveLayoutClient(): JSX.Element {
         <div className="page-layout">
             {/* Sidebar slot: narrow (~260px) — cards use compact layout via @container */}
             <aside className="slot-sidebar" data-testid="slot-sidebar">
-                <p className="slot-label text-sm font-semibold">Sidebar</p>
+                <Typography.Paragraph size="sm" className="slot-label font-semibold">
+                    Sidebar
+                </Typography.Paragraph>
                 <ProductGrid products={sidebarProducts} />
             </aside>
 
             {/* Main slot: wide (flex-1) — same cards switch to rich layout via @container */}
             <main className="slot-main" data-testid="slot-main">
-                <p className="slot-label text-sm font-semibold">Main column</p>
+                <Typography.Paragraph size="sm" className="slot-label font-semibold">
+                    Main column
+                </Typography.Paragraph>
                 <ProductGrid products={products} />
             </main>
         </div>

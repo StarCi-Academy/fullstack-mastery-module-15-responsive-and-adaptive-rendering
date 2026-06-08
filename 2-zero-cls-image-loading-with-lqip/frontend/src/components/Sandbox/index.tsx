@@ -6,6 +6,6 @@ import { LqipImageClient } from "../LqipImageClient"
  * No multi-pane Tabs needed — LQIP / lazy-load / fetchpriority are all
  * single-user browser mechanics, not multi-client realtime features.
  */
-export function Sandbox(): JSX.Element {
+export const Sandbox = (): JSX.Element => {
     return <LqipImageClient />
 }

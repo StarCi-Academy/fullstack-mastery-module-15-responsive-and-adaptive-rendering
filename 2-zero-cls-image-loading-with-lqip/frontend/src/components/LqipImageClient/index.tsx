@@ -67,7 +67,7 @@ interface ReservedImageProps {
  * The LQIP layer is painted instantly from a data URI; when the sharp image
  * finishes loading, the .shown class triggers a 300 ms opacity crossfade.
  */
-export function ReservedImage({
+export const ReservedImage = ({
     src,
     width,
     height,
@@ -76,7 +76,7 @@ export function ReservedImage({
     fetchPriority = "auto",
     className = "",
     "data-fullsrc": dataFullsrc,
-}: ReservedImageProps): JSX.Element {
+}: ReservedImageProps): JSX.Element => {
     const [loaded, setLoaded] = useState<boolean>(false)
 
     return (
@@ -112,7 +112,7 @@ export function ReservedImage({
  * rootMargin grows the viewport so the fetch starts slightly BEFORE the image
  * scrolls into view, hiding network latency.
  */
-export function useLazyImage(rootMargin = "200px"): { ref: React.RefObject<HTMLDivElement>; visible: boolean } {
+export const useLazyImage = (rootMargin = "200px"): { ref: React.RefObject<HTMLDivElement>; visible: boolean } => {
     const ref = useRef<HTMLDivElement>(null!)
     const [visible, setVisible] = useState<boolean>(false)
 
@@ -161,7 +161,7 @@ interface HeroProps {
  * Both together mean the hero image jumps ahead of below-fold images in the
  * resource queue → earlier download → smaller LCP.
  */
-export function Hero({ src, width, height, lqip }: HeroProps): JSX.Element {
+export const Hero = ({ src, width, height, lqip }: HeroProps): JSX.Element => {
     useEffect(() => {
         // Inject a preload hint so the browser discovers and prioritises the hero early
         const link = document.createElement("link")
@@ -192,21 +192,16 @@ export function Hero({ src, width, height, lqip }: HeroProps): JSX.Element {
 
 // ─── ProductCard ───────────────────────────────────────────────────────────────
 
-/**
- * ProductCard — lazy-loaded LQIP card for below-fold products.
- *
- * Uses useLazyImage to defer the src assignment until the card enters the
- * rootMargin band. The ReservedImage is always rendered (so the box is reserved
- * and CLS stays 0), but src is only set once the IntersectionObserver fires.
- */
-function ProductCard({ product, index }: { product: Product; index: number }): JSX.Element {
+interface ProductCardProps { product: Product; index: number }
+
+const ProductCard = ({ product, index }: ProductCardProps): JSX.Element => {
     const { ref, visible } = useLazyImage("200px")
 
     return (
         // The ref wrapper lets IntersectionObserver track when this card enters rootMargin.
         // The testid + ref stay on this element so the observer + Playwright selectors are unchanged.
         <div ref={ref} data-testid={`product-${index}`}>
-            <Card className="gap-0 overflow-hidden rounded-3xl border border-border p-0 shadow-none">
+            <Card className="gap-0 overflow-hidden rounded-3xl border border-default-200 p-0 shadow-none">
                 <ReservedImage
                     // Only assign the real src once the card is near the viewport.
                     // Use undefined (not the lqip) so the sharp <img> does not fire onLoad
@@ -239,7 +234,7 @@ function ProductCard({ product, index }: { product: Product; index: number }): J
  *    are only fetched when they approach the viewport.
  *  - Products are fetched from GET /api/products; falls back to static data on error.
  */
-export function LqipImageClient(): JSX.Element {
+export const LqipImageClient = (): JSX.Element => {
     const [products, setProducts] = useState<Product[]>(FALLBACK_PRODUCTS)
     const [showReloadHint, setShowReloadHint] = useState<boolean>(false)
 

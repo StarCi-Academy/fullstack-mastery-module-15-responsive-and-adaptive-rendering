@@ -5,14 +5,15 @@ import { Card, Typography } from "@heroui/react"
  * This module is dynamically imported via lazy(); the JS chunk is only fetched
  * when AdaptiveSection decides the connection is capable.
  */
-export default function HeavyWidget(): JSX.Element {
+const HeavyWidget = (): JSX.Element => {
     return (
-        <Card data-testid="heavy-widget" className="rounded-3xl border border-border p-3 shadow-none">
+        <Card data-testid="heavy-widget" className="rounded-3xl border border-default-200 p-3 shadow-none">
             <Card.Header className="p-0">
-                <p className="text-sm font-semibold">Analytics Widget</p>
+                <Typography.Paragraph size="sm" color="muted" className="font-semibold">
+                    Analytics Widget
+                </Typography.Paragraph>
             </Card.Header>
             <Card.Content className="flex flex-col gap-2 p-0">
-                <div className="h-1" />
                 {/* Simulated chart bars */}
                 <div className="flex items-end gap-1 h-16">
                     {[40, 65, 55, 80, 70, 90, 60].map((h, i) => (
@@ -30,3 +31,5 @@ export default function HeavyWidget(): JSX.Element {
         </Card>
     )
 }
+
+export default HeavyWidget

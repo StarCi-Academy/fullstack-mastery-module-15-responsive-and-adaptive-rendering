@@ -8,6 +8,6 @@ import { AdaptiveLoadingClient } from "../AdaptiveLoadingClient"
  * The split file structure is kept for a uniform `?sandbox` switch across the
  * whole course.
  */
-export function Sandbox(): JSX.Element {
+export const Sandbox = (): JSX.Element => {
     return <AdaptiveLoadingClient />
 }

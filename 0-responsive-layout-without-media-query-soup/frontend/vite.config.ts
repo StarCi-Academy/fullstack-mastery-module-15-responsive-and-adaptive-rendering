@@ -6,10 +6,10 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     host: "127.0.0.1",
-    port: 3480,
+    port: Number(process.env.FE_PORT ?? "3480"),
   },
   preview: {
     host: "127.0.0.1",
-    port: 3480,
+    port: Number(process.env.FE_PORT ?? "3480"),
   },
 })

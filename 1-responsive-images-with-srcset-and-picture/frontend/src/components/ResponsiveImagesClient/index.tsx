@@ -34,7 +34,7 @@ const GALLERY_SIZES = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px
  * URL paths include the required keyword fragments so spec assertions on
  * `currentSrc` ("800", "wide", "square", ".avif") resolve correctly.
  */
-function buildFallbackProducts(): Product[] {
+const buildFallbackProducts = (): Product[] => {
     return [1, 2, 3, 4, 5, 6].map((id) => ({
         id,
         name: [
@@ -60,14 +60,9 @@ function buildFallbackProducts(): Product[] {
 
 const FALLBACK_PRODUCTS = buildFallbackProducts()
 
-/**
- * ProductImage — resolution switching via srcset + sizes.
- *
- * The BROWSER reads srcset (candidates + "w" descriptors) and sizes
- * (display width per breakpoint) then picks the best candidate — zero JS
- * involved in the choice. data-testid matches spec Flow 1/2 assertions.
- */
-function ProductImage({ product }: { product: Product }): JSX.Element {
+interface ProductImageProps { product: Product }
+
+const ProductImage = ({ product }: ProductImageProps): JSX.Element => {
     return (
         <img
             // Each candidate is "URL <intrinsic-width>w"; browser matches against sizes x DPR.
@@ -84,15 +79,9 @@ function ProductImage({ product }: { product: Product }): JSX.Element {
     )
 }
 
-/**
- * ProductHero — art direction + format negotiation via <picture>.
- *
- * Developer controls:
- *   - media="(max-width: 640px)" swaps to a square crop below the breakpoint.
- *   - type="image/avif" / "image/webp" orders format preference; browser picks
- *     the FIRST type it supports (top-down). data-testid matches spec Flow 3/4.
- */
-function ProductHero({ product }: { product: Product }): JSX.Element {
+interface ProductHeroProps { product: Product }
+
+const ProductHero = ({ product }: ProductHeroProps): JSX.Element => {
     return (
         <picture className="hero-picture overflow-hidden rounded-3xl border border-border">
             {/* Art direction: below 640px switch to the SQUARE crop (different framing). */}
@@ -115,14 +104,9 @@ function ProductHero({ product }: { product: Product }): JSX.Element {
     )
 }
 
-/**
- * BelowFoldImage — lazy loading + async decoding for images below the fold.
- *
- * loading="lazy" defers download until the image approaches the viewport.
- * decoding="async" decodes off the main thread to keep scrolling smooth.
- * width/height reserve space to prevent CLS. data-testid matches spec lazy assertions.
- */
-function BelowFoldImage({ product }: { product: Product }): JSX.Element {
+interface BelowFoldImageProps { product: Product }
+
+const BelowFoldImage = ({ product }: BelowFoldImageProps): JSX.Element => {
     return (
         <img
             srcSet={`${product.img400} 400w, ${product.img800} 800w`}
@@ -141,16 +125,17 @@ function BelowFoldImage({ product }: { product: Product }): JSX.Element {
     )
 }
 
-/** Gallery card wrapping either an above-fold or below-fold image. */
-function ProductCard({
-    product,
-    aboveFold,
-}: {
+interface ProductCardProps {
     product: Product
     aboveFold: boolean
-}): JSX.Element {
+}
+
+const ProductCard = ({
+    product,
+    aboveFold,
+}: ProductCardProps): JSX.Element => {
     return (
-        <Card className="product-card gap-0 overflow-hidden rounded-3xl border border-border p-0 shadow-none">
+        <Card className="product-card gap-0 overflow-hidden rounded-3xl border border-default-200 p-0 shadow-none">
             {/* The native <img>/<picture> functional core is unchanged — only the
                 surrounding chrome is now a HeroUI Card. */}
             {aboveFold ? (
@@ -175,7 +160,7 @@ function ProductCard({
  *      First 2 products are above-fold (no lazy); remainder use loading="lazy".
  *   3. Products fetched from GET /api/products; falls back to static data on error.
  */
-export function ResponsiveImagesClient(): JSX.Element {
+export const ResponsiveImagesClient = (): JSX.Element => {
     const [products, setProducts] = useState<Product[]>(FALLBACK_PRODUCTS)
 
     useEffect(() => {
@@ -197,26 +182,32 @@ export function ResponsiveImagesClient(): JSX.Element {
     const hero = products[0]
 
     return (
-        <div>
+        <div className="flex flex-col gap-6">
             {/* ── Hero: art direction + format negotiation via <picture> ── */}
-            <p className="section-label text-sm font-semibold">Hero (art direction + format)</p>
-            {hero && <ProductHero product={hero} />}
-
-            <div className="h-6" />
+            <div className="flex flex-col gap-3">
+                <Typography.Paragraph size="sm" color="muted" className="section-label font-semibold">
+                    Hero (art direction + format)
+                </Typography.Paragraph>
+                {hero && <ProductHero product={hero} />}
+            </div>
 
             {/* ── Gallery: resolution switching via srcset + sizes ── */}
-            <p className="section-label text-sm font-semibold">Gallery (resolution switching)</p>
-            <ul className="gallery-grid" data-testid="gallery-grid">
-                {products.map((product, index) => (
-                    <li key={product.id}>
-                        {/*
-                         * First 2 items are above the fold — no lazy loading.
-                         * Remaining items use loading="lazy" + decoding="async".
-                         */}
-                        <ProductCard product={product} aboveFold={index < 2} />
-                    </li>
-                ))}
-            </ul>
+            <div className="flex flex-col gap-3">
+                <Typography.Paragraph size="sm" color="muted" className="section-label font-semibold">
+                    Gallery (resolution switching)
+                </Typography.Paragraph>
+                <ul className="gallery-grid" data-testid="gallery-grid">
+                    {products.map((product, index) => (
+                        <li key={product.id}>
+                            {/*
+                             * First 2 items are above the fold — no lazy loading.
+                             * Remaining items use loading="lazy" + decoding="async".
+                             */}
+                            <ProductCard product={product} aboveFold={index < 2} />
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     )
 }
